@@ -1,0 +1,9 @@
+set_io LEDS[0] B6
+
+set_io CLK D1
+
+set_io RESET E2
+
+set_io RXD  E3
+set_io TXD  F3
+
