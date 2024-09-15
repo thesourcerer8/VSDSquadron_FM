@@ -6,9 +6,11 @@ build:
 	nextpnr-ice40 --lp1k --package cm36 --json $(filename).json --pcf $(pcf_file) --asc $(filename).asc --freq 48
 	icepack $(filename).asc $(filename).bin
 
-prog_flash:
+flash_internal:
 	iceprog -S $(filename).bin
 
+flash_external:
+	iceprog $(filename).bin
 
 clean:
 	rm -rf $(filename).blif $(filename).asc $(filename).bin $(filename).json

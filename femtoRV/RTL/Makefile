@@ -18,7 +18,7 @@ build:
 	icetime -p $(BOARD).pcf -P $(FPGA_PACKAGE) -r $(PROJECTNAME).timings -d $(FPGA_VARIANT) -t $(PROJECTNAME).asc
 	icepack $(PROJECTNAME).asc $(PROJECTNAME).bin
 
-flash:
+flash_external:
 	iceprog -S $(PROJECTNAME).bin
 
 clean:

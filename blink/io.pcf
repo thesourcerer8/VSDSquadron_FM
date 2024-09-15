@@ -1,6 +1,4 @@
 set_io LED B6
-
 set_io LED2 A3
-
 
 set_io CLK D1
