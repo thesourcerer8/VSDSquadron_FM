@@ -1,4 +1,3 @@
-
 module switch(  input CLK,
                 output LED,
                 output LED2
