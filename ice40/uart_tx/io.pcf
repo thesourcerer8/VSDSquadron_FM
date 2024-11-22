@@ -1,7 +1,0 @@
-set_io LED B6
-
-set_io clk D1
-
-set_io RX  E3
-set_io TX  F3
-
