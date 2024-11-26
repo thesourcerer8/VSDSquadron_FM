@@ -26,7 +26,7 @@ Follow these steps to build and flash a project:
 
 2. Build the binaries:
    ```bash
-   make
+   make build
    ```
 
 3. Flash the code to external SRAM:
