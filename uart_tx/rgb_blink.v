@@ -10,19 +10,25 @@ module rgb_blink (
   output wire led_red  , // Red
   output wire led_blue , // Blue
   output wire led_green , // Green
-  output wire uarttx// UART Transmission pin
+  output wire uarttx , // UART Transmission pin
+  input wire  hw_clk
 );
 
   wire        int_osc            ;
   reg  [27:0] frequency_counter_i;
-
-uart_tx_8n1 DanUART (.clk(int_osc), .txbyte("D"), .senddata(frequency_counter_i[24]), .tx(uarttx));
+  
+/* 9600 Hz clock generation (from 12 MHz) */
+    reg clk_9600 = 0;
+    reg [31:0] cntr_9600 = 32'b0;
+    parameter period_9600 = 625;
+    
+uart_tx_8n1 DanUART (.clk (clk_9600), .txbyte("D"), .senddata(frequency_counter_i[24]), .tx(uarttx));
 //----------------------------------------------------------------------------
 //                                                                          --
 //                       Internal Oscillator                                --
 //                                                                          --
 //----------------------------------------------------------------------------
-  SB_HFOSC u_SB_HFOSC (.CLKHFPU(1'b1), .CLKHFEN(1'b1), .CLKHF(int_osc));
+  SB_HFOSC #(.CLKHF_DIV ("0b10")) u_SB_HFOSC ( .CLKHFPU(1'b1), .CLKHFEN(1'b1), .CLKHF(int_osc));
 
 
 //----------------------------------------------------------------------------
@@ -32,6 +38,12 @@ uart_tx_8n1 DanUART (.clk(int_osc), .txbyte("D"), .senddata(frequency_counter_i[
 //----------------------------------------------------------------------------
   always @(posedge int_osc) begin
     frequency_counter_i <= frequency_counter_i + 1'b1;
+        /* generate 9600 Hz clock */
+        cntr_9600 <= cntr_9600 + 1;
+        if (cntr_9600 == period_9600) begin
+            clk_9600 <= ~clk_9600;
+            cntr_9600 <= 32'b0;
+        end
   end
 
 //----------------------------------------------------------------------------
