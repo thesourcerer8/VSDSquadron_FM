@@ -29,9 +29,9 @@ module rgb_blink (
   wire [31:0] reg_dat_do;
   wire        reg_dat_wait;
 
-  reg rgb_red;
-  reg rgb_blue;
-  reg rgb_green;
+  reg rgb_red = 0;
+  reg rgb_blue = 0;
+  reg rgb_green = 1;
 
 // We have to set the DEFAULT_DIV to the correct divider for the baudrate! 
   simpleuart #(.DEFAULT_DIV(625)) DanUART 
@@ -49,16 +49,13 @@ module rgb_blink (
     .reg_div_di(0)
   );
 
-  reg [5:0] reset_cnt = 0;
+  reg [64:0] reset_cnt = 0;
   wire resetn = &reset_cnt;
 
   always @(posedge int_osc) begin
-  reset_cnt <= reset_cnt + !resetn;
-
-
-
+    reset_cnt <= reset_cnt + !resetn;
   end
-  reg [3:0] mystate;
+  reg [3:0] mystate = 0;
 
 //----------------------------------------------------------------------------
 //                                                                          --
@@ -66,68 +63,67 @@ module rgb_blink (
 //                                                                          --
 //----------------------------------------------------------------------------
   always @(posedge int_osc) begin
-    if (!resetn) begin
-      mystate <= 0;
-      reg_dat_we <=0;
-      reg_dat_re <=0;
-      reg_dat_di <=0;
-      rgb_red <= 1;
-      rgb_blue <= 1;
-      rgb_green <= 1;
-    end else begin
-      case(mystate)
-        0: begin
-        reg_dat_re<=1;
-        mystate<=1;
+    case(mystate)
+      0: begin
+        mystate <= 1;
+        reg_dat_we <=0;
+        reg_dat_re <=0;
+        reg_dat_di <=0;
+        rgb_red <= 1;
+        rgb_blue <= 1;
+        rgb_green <= 1;
         end
-	2: begin
-  	  reg_dat_we <= 0; // In the next state we switch the writing off again and start reading again
-	  mystate<=0;
-	end
-        1: begin
+      1: begin
+        reg_dat_re<=1;
+        mystate<=2;
+        end
+      2: begin
         if (reg_dat_do != -1) begin
-           case (reg_dat_do)
-             "0": begin
-               rgb_red <= 0;
-               rgb_blue <= 0;
-               rgb_green <= 0;
-               end
-             "1": begin
-               rgb_red <= 1;
-               rgb_blue <= 0;
-               rgb_green <= 0;
-	       end
-             "2": begin
-               rgb_red <= 1;
-               rgb_blue <= 0;
-               rgb_green <= 1;
-               end
-             "3": begin
-               rgb_red <= 0;
-               rgb_blue <= 0;
-               rgb_green <= 1;
-               end
-             "4": begin
-               rgb_red <= 1;
-               rgb_blue <= 1;
-               rgb_green <= 1;
-               end
-             "5": begin
-               rgb_red <= 0;
-               rgb_blue <= 1;
-               rgb_green <= 0;
-               end
-	     default: begin
-               reg_dat_re <= 0; // We stop reading
-	       reg_dat_di <= reg_dat_do+1; // We choose what character we want to write
-	       reg_dat_we <= 1; // We start writing
-	       mystate<= 2;
-	     end
-           endcase
-         end  
-      end
+          case (reg_dat_do)
+            "0": begin
+              rgb_red <= 0;
+              rgb_blue <= 0;
+              rgb_green <= 0;
+              end
+            "1": begin
+              rgb_red <= 1;
+              rgb_blue <= 0;
+              rgb_green <= 0;
+              end
+            "2": begin
+              rgb_red <= 1;
+              rgb_blue <= 0;
+              rgb_green <= 1;
+              end
+            "3": begin
+              rgb_red <= 0;
+              rgb_blue <= 0;
+              rgb_green <= 1;
+              end
+            "4": begin
+              rgb_red <= 1;
+              rgb_blue <= 1;
+              rgb_green <= 1;
+              end
+            "5": begin
+              rgb_red <= 0;
+              rgb_blue <= 1;
+              rgb_green <= 0;
+              end
+            default: begin
+              reg_dat_re <= 0; // We stop reading
+              reg_dat_di <= reg_dat_do+1; // We choose what character we want to write
+              reg_dat_we <= 1; // We start writing
+	      mystate<= 3;
+	    end
+          endcase
+          end  
+	end
+   	3: begin
+  	  reg_dat_we <= 0; // In the next state we switch the writing off again and start reading again
+	  mystate<=1;
+	end
     endcase
-  end
   end
 
 //----------------------------------------------------------------------------
