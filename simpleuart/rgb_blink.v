@@ -78,8 +78,9 @@ module rgb_blink (
         mystate<=2;
         end
       2: begin
-        if (reg_dat_do != -1) begin
           case (reg_dat_do)
+            -1: begin
+		end
             "0": begin
               rgb_red <= 0;
               rgb_blue <= 0;
@@ -117,7 +118,6 @@ module rgb_blink (
 	      mystate<= 3;
 	    end
           endcase
-          end  
 	end
    	3: begin
   	  reg_dat_we <= 0; // In the next state we switch the writing off again and start reading again
@@ -140,14 +140,14 @@ module rgb_blink (
 //                                                                          --
 //----------------------------------------------------------------------------
   SB_RGBA_DRV RGB_DRIVER (
-    .RGBLEDEN(1'b1                                            ),
+    .RGBLEDEN(1'b1      ),
     .RGB0PWM (rgb_green ),
-    .RGB1PWM (rgb_blue),
-    .RGB2PWM (rgb_red),
-    .CURREN  (1'b1                                            ),
-    .RGB0    (led_green                                       ), //Actual Hardware connection
-    .RGB1    (led_blue                                        ),
-    .RGB2    (led_red                                         )
+    .RGB1PWM (rgb_blue  ),
+    .RGB2PWM (rgb_red   ),
+    .CURREN  (1'b1      ),
+    .RGB0    (led_green ), //Actual Hardware connection
+    .RGB1    (led_blue  ),
+    .RGB2    (led_red   )
   );
   defparam RGB_DRIVER.RGB0_CURRENT = "0b000001";
   defparam RGB_DRIVER.RGB1_CURRENT = "0b000001";
