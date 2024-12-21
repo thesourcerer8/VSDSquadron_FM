@@ -71,6 +71,9 @@ module rgb_blink (
       reg_dat_we <=0;
       reg_dat_re <=0;
       reg_dat_di <=0;
+      rgb_red <= 1;
+      rgb_blue <= 1;
+      rgb_green <= 1;
     end else begin
       case(mystate)
         0: begin
