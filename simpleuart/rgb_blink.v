@@ -82,7 +82,7 @@ module rgb_blink (
         end
 	2: begin
   	  reg_dat_we <= 0; // In the next state we switch the writing off again and start reading again
-	  state<=0;
+	  mystate<=0;
 	end
         1: begin
         if (reg_dat_do != -1) begin
@@ -121,7 +121,7 @@ module rgb_blink (
                reg_dat_re <= 0; // We stop reading
 	       reg_dat_di <= reg_dat_do+1; // We choose what character we want to write
 	       reg_dat_we <= 1; // We start writing
-	       state<= 2;
+	       mystate<= 2;
 	     end
            endcase
          end  
