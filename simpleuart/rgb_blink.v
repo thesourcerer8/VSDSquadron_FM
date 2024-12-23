@@ -36,7 +36,7 @@ module rgb_blink (
 // We have to set the DEFAULT_DIV to the correct divider for the baudrate! 
   simpleuart #(.DEFAULT_DIV(625)) DanUART 
   (
-    .clk (hw_clk), 
+    .clk (int_osc), 
     .resetn(resetn),
     .ser_tx(uarttx), 
     .ser_rx(uartrx), 
