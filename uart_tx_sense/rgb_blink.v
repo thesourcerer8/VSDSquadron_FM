@@ -11,7 +11,7 @@ module rgb_blink (
   output wire led_blue , // Blue
   output wire led_green , // Green
   output wire uarttx , // UART Transmission pin
-  output wire uartrx , // UART Transmission pin
+  input wire uartrx , // UART Transmission pin
   input wire  hw_clk
 );
 
@@ -54,9 +54,9 @@ uart_tx_8n1 DanUART (.clk (clk_9600), .txbyte("D"), .senddata(frequency_counter_
 //----------------------------------------------------------------------------
   SB_RGBA_DRV RGB_DRIVER (
     .RGBLEDEN(1'b1                                            ),
-    .RGB0PWM (uart_rx),
-    .RGB1PWM (uart_rx),
-    .RGB2PWM (uart_rx),
+    .RGB0PWM (uartrx),
+    .RGB1PWM (uartrx),
+    .RGB2PWM (uartrx),
     .CURREN  (1'b1                                            ),
     .RGB0    (led_green                                       ), //Actual Hardware connection
     .RGB1    (led_blue                                        ),
