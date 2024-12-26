@@ -25,3 +25,8 @@ clean:
 
 terminal:
 	sudo picocom -b $(BAUDS) $(PICO_DEVICE) --imap lfcrlf,crcrlf --omap delbs,crlf --send-cmd "ascii-xfr -s -l 30 -n"
+
+cycle:
+	git pull
+	make
+	sudo make flash
