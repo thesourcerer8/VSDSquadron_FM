@@ -29,9 +29,9 @@ module rgb_blink (
   wire [31:0] reg_dat_do;
   wire        reg_dat_wait;
 
-  reg rgb_red ;
-  reg rgb_blue ;
-  reg rgb_green;
+  reg rgb_red = 1;
+  reg rgb_blue = 0;
+  reg rgb_green = 0;
 
   reg [4:0] reset_cnt = 0;
   wire resetn = &reset_cnt;
@@ -75,34 +75,35 @@ module rgb_blink (
 //----------------------------------------------------------------------------
   always @(posedge hw_clk) begin
 
-    if(!reg_dat_do[8] && prevbit) begin
-      // We received a Byte
-      rgb_red <= 1;
-      rgb_blue <= 1;
-      rgb_green <= 0;
-      reg_dat_di <= reg_dat_do+3;
-      reg_dat_we <= 1;
-    end
-    prevbit <= reg_dat_do[8];
-
     if(reg_dat_we && !reg_dat_wait) begin
       reg_dat_we <= 0;
     end
 
+
+    //if(!reg_dat_do[8] && prevbit) begin
+    //  // We received a Byte
+    //  rgb_red <= 1;
+    //  rgb_blue <= 1;
+    //  rgb_green <= 0;
+    //  reg_dat_di <= reg_dat_do+3;
+    //  reg_dat_we <= 1;
+    //end
+    //prevbit <= reg_dat_do[8];
+
     case(mystate)
       0: begin
-        mystate <= 1;
         reg_dat_we <=0;
         reg_dat_re <=0;
         reg_dat_di <=0;
-        rgb_red <= 1;
-        rgb_blue <= 1;
+        rgb_red <= 0;
+        rgb_blue <= 0;
         rgb_green <= 1;
+        if(resetn) mystate <= 1;
         end
       1: begin
-        mystate<=2;
 	reg_dat_di <="P";
 	reg_dat_we<=1;
+        mystate<=2;
         end
       2: begin
           case (reg_dat_do)
@@ -147,9 +148,9 @@ module rgb_blink (
               end
 
             default: begin
-              reg_dat_re <= 0; // We stop reading
+              //reg_dat_re <= 0; // We stop reading
               reg_dat_di <= reg_dat_do+1; // We choose what character we want to write
-              //reg_dat_we <= 1; // We start writing
+              reg_dat_we <= 1; // We start writing
 	      //mystate<= 3;
 	    end
           endcase
