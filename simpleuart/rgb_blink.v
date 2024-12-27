@@ -146,7 +146,7 @@ module rgb_blink (
               reg_dat_re <= 0; // We stop reading
               reg_dat_di <= reg_dat_do+1; // We choose what character we want to write
               //reg_dat_we <= 1; // We start writing
-	      mystate<= 3;
+	      //mystate<= 3;
 	    end
           endcase
 	end
