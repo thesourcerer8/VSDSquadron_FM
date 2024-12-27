@@ -77,17 +77,6 @@ module rgb_blink (
 
     reg_dat_we <= 0;
 
-
-    //if(!reg_dat_do[8] && prevbit) begin
-    //  // We received a Byte
-    //  rgb_red <= 1;
-    //  rgb_blue <= 1;
-    //  rgb_green <= 0;
-    //  reg_dat_di <= reg_dat_do+3;
-    //  reg_dat_we <= 1;
-    //end
-    //prevbit <= reg_dat_do[8];
-
     case(mystate)
       0: begin
         reg_dat_we <=0;
@@ -104,6 +93,7 @@ module rgb_blink (
         mystate<=2;
         end
       2: begin
+         if(!reg_dat_do[8] && prevbit) begin // We received a Byte
           case (reg_dat_do)
             -1: begin
 		end
@@ -152,6 +142,8 @@ module rgb_blink (
 	      //mystate<= 3;
 	    end
           endcase
+         end
+         prevbit <= reg_dat_do[8];
 	end
    	3: begin
   	  reg_dat_we <= 0; // In the next state we switch the writing off again and start reading again
