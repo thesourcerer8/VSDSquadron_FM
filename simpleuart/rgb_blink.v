@@ -85,6 +85,10 @@ module rgb_blink (
     end
     prevbit <= reg_dat_do[8];
 
+    if(reg_dat_we && !reg_dat_wait) begin
+      reg_dat_we <= 0;
+    end
+
     case(mystate)
       0: begin
         mystate <= 1;
@@ -136,7 +140,7 @@ module rgb_blink (
               rgb_blue <= 1;
               rgb_green <= 0;
               end
-            "6": begin // blue
+            "6": begin // green
               rgb_red <= 0;
               rgb_blue <= 1;
               rgb_green <= 1;
@@ -181,8 +185,8 @@ module rgb_blink (
     .RGB1    (led_green ),
     .RGB2    (led_blue  )
   );
-  defparam RGB_DRIVER.RGB0_CURRENT = "0b000011";
-  defparam RGB_DRIVER.RGB1_CURRENT = "0b000011";
-  defparam RGB_DRIVER.RGB2_CURRENT = "0b000011";
+  defparam RGB_DRIVER.RGB0_CURRENT = "0b000001";
+  defparam RGB_DRIVER.RGB1_CURRENT = "0b000001";
+  defparam RGB_DRIVER.RGB2_CURRENT = "0b000001";
 
 endmodule
