@@ -33,7 +33,7 @@ module rgb_blink (
   reg rgb_blue ;
   reg rgb_green;
 
-  reg [5:0] reset_cnt = 0;
+  reg [4:0] reset_cnt = 0;
   wire resetn = &reset_cnt;
 
 
@@ -58,6 +58,7 @@ module rgb_blink (
   end
   reg [3:0] mystate = 0;
 
+  reg prevbit = 0;
 
   always @(negedge reg_dat_do[8]) begin // When we receive a character the dat_do should go from -1 to a value between 0-255, so the 8th bit should go from 1 to 0
               //rgb_red <= 0; This would be a conflicting driver!
@@ -73,6 +74,17 @@ module rgb_blink (
 //                                                                          --
 //----------------------------------------------------------------------------
   always @(posedge hw_clk) begin
+
+    if(!reg_dat_do[8] && prevbit) begin
+      // We received a Byte
+      rgb_red <= 1;
+      rgb_blue <= 1;
+      rgb_green <= 0;
+      reg_dat_di <= reg_dat_do+3;
+      reg_dat_we <= 1;
+    end
+    prevbit <= reg_dat_do[8];
+
     case(mystate)
       0: begin
         mystate <= 1;
@@ -134,6 +146,7 @@ module rgb_blink (
   	  reg_dat_we <= 0; // In the next state we switch the writing off again and start reading again
 	  mystate<=1;
 	end
+      default: mystate<=0;
     endcase
   end
 
@@ -153,12 +166,12 @@ module rgb_blink (
   SB_RGBA_DRV RGB_DRIVER (
     .RGBLEDEN(1'b1      ),
     .RGB0PWM (rgb_red   ),
-    .RGB1PWM (rgb_blue  ),
-    .RGB2PWM (rgb_green ),
+    .RGB1PWM (rgb_green ),
+    .RGB2PWM (rgb_blue  ),
     .CURREN  (1'b1      ),
     .RGB0    (led_red   ), //Actual Hardware connection
-    .RGB1    (led_blue  ),
-    .RGB2    (led_green )
+    .RGB1    (led_green ),
+    .RGB2    (led_blue  )
   );
   defparam RGB_DRIVER.RGB0_CURRENT = "0b000001";
   defparam RGB_DRIVER.RGB1_CURRENT = "0b000001";
