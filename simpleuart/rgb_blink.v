@@ -75,9 +75,7 @@ module rgb_blink (
 //----------------------------------------------------------------------------
   always @(posedge hw_clk) begin
 
-    if(reg_dat_we && !reg_dat_wait) begin
-      reg_dat_we <= 0;
-    end
+    reg_dat_we <= 0;
 
 
     //if(!reg_dat_do[8] && prevbit) begin
