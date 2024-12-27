@@ -58,7 +58,7 @@ module rgb_blink (
   end
   reg [3:0] mystate = 0;
 
-  reg prevbit = 0;
+  reg [31:0] prevbit = 0;
 
   always @(negedge reg_dat_do[8]) begin // When we receive a character the dat_do should go from -1 to a value between 0-255, so the 8th bit should go from 1 to 0
               //rgb_red <= 0; This would be a conflicting driver!
@@ -75,7 +75,7 @@ module rgb_blink (
 //----------------------------------------------------------------------------
   always @(posedge hw_clk) begin
 
-    reg_dat_we <= 0;
+    //reg_dat_we <= 0;
 
     case(mystate)
       0: begin
@@ -93,7 +93,7 @@ module rgb_blink (
         mystate<=2;
         end
       2: begin
-         if(!reg_dat_do[8] && prevbit) begin // We received a Byte
+         if(reg_dat_do!=-1 && prevbit==-1) begin // We received a Byte
           case (reg_dat_do)
             -1: begin
 		end
@@ -143,7 +143,7 @@ module rgb_blink (
 	    end
           endcase
          end
-         prevbit <= reg_dat_do[8];
+         prevbit <= reg_dat_do;
 	end
    	3: begin
   	  reg_dat_we <= 0; // In the next state we switch the writing off again and start reading again
