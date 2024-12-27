@@ -34,3 +34,4 @@ cycle:
 test:
 	iverilog -o testbench testbench.sv -Wall -g2005-sv
 	vvp testbench
+	gtkwave testbench.gtkw
