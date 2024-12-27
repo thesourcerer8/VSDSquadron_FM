@@ -19,22 +19,22 @@
 
 module simpleuart #(parameter integer DEFAULT_DIV = 1) (
 	input clk,
-	input resetn,
+	input resetn, // Negated RESET signal. Should be normally 1 and 0 when RESET
 
 	output ser_tx,
 	input  ser_rx,
 
-	input   [3:0] reg_div_we,
+	input   [3:0] reg_div_we, // Register for the Divider, not needed when the DEFAULT_DIV is set properly
 	input  [31:0] reg_div_di,
 	output [31:0] reg_div_do,
 
-	input         reg_dat_we,
-	input         reg_dat_re,
-	input  [31:0] reg_dat_di,
-	output [31:0] reg_dat_do,
-	output        reg_dat_wait
+	input         reg_dat_we, // Write-Enabled for writing a character
+	input         reg_dat_re, // Read-Enabled for reading a character - THIS SHOULD BE SET TO 0 all the time, otherwise it invalidates the buffer!
+	input  [31:0] reg_dat_di, // character to be sent
+	output [31:0] reg_dat_do, // character that was received or -1 if no character was received
+	output        reg_dat_wait // Wait for character to be sent
 );
-	reg [31:0] cfg_divider;
+	reg [31:0] cfg_divider; // Register holding the frequency divider value
 
 	reg [3:0] recv_state;
 	reg [31:0] recv_divcnt;
@@ -49,10 +49,10 @@ module simpleuart #(parameter integer DEFAULT_DIV = 1) (
 
 	assign reg_div_do = cfg_divider;
 
-	assign reg_dat_wait = reg_dat_we && (send_bitcnt || send_dummy);
-	assign reg_dat_do = recv_buf_valid ? recv_buf_data : ~0;
+	assign reg_dat_wait = reg_dat_we && (send_bitcnt || send_dummy); // Seems like "dat_we" needs to be hold up from the beginning of sending a character until it has been sent and wait gets 0
+	assign reg_dat_do = recv_buf_valid ? recv_buf_data : ~0; // If the buffer is valid, we deliver the character, otherwise we deliver -1
 
-	always @(posedge clk) begin
+	always @(posedge clk) begin // Programming of the Frequency divider, it needs a RESETN to be set to 0 for at least one cycle
 		if (!resetn) begin
 			cfg_divider <= DEFAULT_DIV;
 		end else begin
@@ -63,7 +63,7 @@ module simpleuart #(parameter integer DEFAULT_DIV = 1) (
 		end
 	end
 
-	always @(posedge clk) begin
+	always @(posedge clk) begin // RX Logic
 		if (!resetn) begin
 			recv_state <= 0;
 			recv_divcnt <= 0;
@@ -106,8 +106,8 @@ module simpleuart #(parameter integer DEFAULT_DIV = 1) (
 
 	assign ser_tx = send_pattern[0];
 
-	always @(posedge clk) begin
-		if (reg_div_we)
+	always @(posedge clk) begin // TX Logic
+		if (reg_div_we) // Attention please: This is reg_div_we, not reg_dat_we !!! While changing the divider, we don't send anymore.
 			send_dummy <= 1;
 		send_divcnt <= send_divcnt + 1;
 		if (!resetn) begin
