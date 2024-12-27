@@ -36,7 +36,7 @@ module rgb_blink (
 // We have to set the DEFAULT_DIV to the correct divider for the baudrate! 
   simpleuart #(.DEFAULT_DIV(625)) DanUART 
   (
-    .clk (int_osc), 
+    .clk (hw_clk), 
     .resetn(resetn),
     .ser_tx(uarttx), 
     .ser_rx(uartrx), 
@@ -52,7 +52,7 @@ module rgb_blink (
   reg [64:0] reset_cnt = 0;
   wire resetn = &reset_cnt;
 
-  always @(posedge int_osc) begin
+  always @(posedge hw_clk) begin
     reset_cnt <= reset_cnt + !resetn;
   end
   reg [3:0] mystate = 0;
@@ -62,7 +62,7 @@ module rgb_blink (
 //                       Counter                                            --
 //                                                                          --
 //----------------------------------------------------------------------------
-  always @(posedge int_osc) begin
+  always @(posedge hw_clk) begin
     case(mystate)
       0: begin
         mystate <= 1;
@@ -141,13 +141,13 @@ module rgb_blink (
 //----------------------------------------------------------------------------
   SB_RGBA_DRV RGB_DRIVER (
     .RGBLEDEN(1'b1      ),
-    .RGB0PWM (rgb_green ),
+    .RGB0PWM (rgb_red   ),
     .RGB1PWM (rgb_blue  ),
-    .RGB2PWM (rgb_red   ),
+    .RGB2PWM (rgb_green ),
     .CURREN  (1'b1      ),
-    .RGB0    (led_green ), //Actual Hardware connection
+    .RGB0    (led_red   ), //Actual Hardware connection
     .RGB1    (led_blue  ),
-    .RGB2    (led_red   )
+    .RGB2    (led_green )
   );
   defparam RGB_DRIVER.RGB0_CURRENT = "0b000001";
   defparam RGB_DRIVER.RGB1_CURRENT = "0b000001";
