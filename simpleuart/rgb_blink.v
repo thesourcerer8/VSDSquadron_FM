@@ -136,6 +136,12 @@ module rgb_blink (
               rgb_blue <= 1;
               rgb_green <= 0;
               end
+            "6": begin // blue
+              rgb_red <= 0;
+              rgb_blue <= 1;
+              rgb_green <= 1;
+              end
+
             default: begin
               reg_dat_re <= 0; // We stop reading
               reg_dat_di <= reg_dat_do+1; // We choose what character we want to write
@@ -175,8 +181,8 @@ module rgb_blink (
     .RGB1    (led_green ),
     .RGB2    (led_blue  )
   );
-  defparam RGB_DRIVER.RGB0_CURRENT = "0b000001";
-  defparam RGB_DRIVER.RGB1_CURRENT = "0b000001";
-  defparam RGB_DRIVER.RGB2_CURRENT = "0b000001";
+  defparam RGB_DRIVER.RGB0_CURRENT = "0b000011";
+  defparam RGB_DRIVER.RGB1_CURRENT = "0b000011";
+  defparam RGB_DRIVER.RGB2_CURRENT = "0b000011";
 
 endmodule
