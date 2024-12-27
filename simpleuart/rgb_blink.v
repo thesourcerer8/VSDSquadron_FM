@@ -29,12 +29,16 @@ module rgb_blink (
   wire [31:0] reg_dat_do;
   wire        reg_dat_wait;
 
-  reg rgb_red = 0;
-  reg rgb_blue = 0;
-  reg rgb_green = 1;
+  reg rgb_red ;
+  reg rgb_blue ;
+  reg rgb_green;
+
+  reg [5:0] reset_cnt = 0;
+  wire resetn = &reset_cnt;
+
 
 // We have to set the DEFAULT_DIV to the correct divider for the baudrate! 
-  simpleuart #(.DEFAULT_DIV(625)) DanUART 
+  simpleuart #(.DEFAULT_DIV(1250)) DanUART 
   (
     .clk (hw_clk), 
     .resetn(resetn),
@@ -45,17 +49,23 @@ module rgb_blink (
     .reg_dat_di(reg_dat_di), 
     .reg_dat_do(reg_dat_do), 
     .reg_dat_wait(reg_dat_wait),
-    .reg_div_we(1'b0),
+    .reg_div_we(4'b0),
     .reg_div_di(0)
   );
-
-  reg [64:0] reset_cnt = 0;
-  wire resetn = &reset_cnt;
 
   always @(posedge hw_clk) begin
     reset_cnt <= reset_cnt + !resetn;
   end
   reg [3:0] mystate = 0;
+
+
+  always @(negedge reg_dat_do[8]) begin // When we receive a character the dat_do should go from -1 to a value between 0-255, so the 8th bit should go from 1 to 0
+              //rgb_red <= 0; This would be a conflicting driver!
+              //rgb_blue <= 1;
+              //rgb_green <= 1;
+	      //reg_dat_di <= reg_dat_di+1;
+
+  end
 
 //----------------------------------------------------------------------------
 //                                                                          --
@@ -74,8 +84,9 @@ module rgb_blink (
         rgb_green <= 1;
         end
       1: begin
-        reg_dat_re<=1;
         mystate<=2;
+	reg_dat_di <="P";
+	reg_dat_we<=1;
         end
       2: begin
           case (reg_dat_do)
