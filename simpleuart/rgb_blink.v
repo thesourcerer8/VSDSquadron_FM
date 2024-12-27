@@ -104,32 +104,34 @@ module rgb_blink (
           case (reg_dat_do)
             -1: begin
 		end
-            "0": begin
+            "0": begin  // black
               rgb_red <= 0;
               rgb_blue <= 0;
               rgb_green <= 0;
+	      reg_dat_we <= 0;
               end
-            "1": begin
+            "1": begin // red
               rgb_red <= 1;
               rgb_blue <= 0;
               rgb_green <= 0;
+	      reg_dat_we <= 1;
               end
-            "2": begin
+            "2": begin // red ?!?
               rgb_red <= 1;
               rgb_blue <= 0;
               rgb_green <= 1;
               end
-            "3": begin
+            "3": begin // green
               rgb_red <= 0;
               rgb_blue <= 0;
               rgb_green <= 1;
               end
-            "4": begin
+            "4": begin // red ?!?
               rgb_red <= 1;
               rgb_blue <= 1;
               rgb_green <= 1;
               end
-            "5": begin
+            "5": begin // blue
               rgb_red <= 0;
               rgb_blue <= 1;
               rgb_green <= 0;
@@ -137,7 +139,7 @@ module rgb_blink (
             default: begin
               reg_dat_re <= 0; // We stop reading
               reg_dat_di <= reg_dat_do+1; // We choose what character we want to write
-              reg_dat_we <= 1; // We start writing
+              //reg_dat_we <= 1; // We start writing
 	      mystate<= 3;
 	    end
           endcase
