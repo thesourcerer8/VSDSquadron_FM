@@ -44,12 +44,12 @@ module rgb_blink (
   SB_RGBA_DRV RGB_DRIVER (
     .RGBLEDEN(1'b1                                            ),
     .RGB0PWM (1'b1), // red  
-    .RGB1PWM (1'b0), // blue
-    .RGB2PWM (1'b0), // green
+    .RGB1PWM (1'b0), // green
+    .RGB2PWM (1'b0), // blue  
     .CURREN  (1'b1                                            ),
     .RGB0    (led_red                                         ), //Actual Hardware connection
-    .RGB1    (led_blue                                        ),
-    .RGB2    (led_green                                       )
+    .RGB1    (led_green                                       ),
+    .RGB2    (led_blue                                        )
   );
   defparam RGB_DRIVER.RGB0_CURRENT = "0b000001";
   defparam RGB_DRIVER.RGB1_CURRENT = "0b000001";
