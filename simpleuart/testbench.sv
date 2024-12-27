@@ -53,8 +53,10 @@ begin
 
 	#260ns
 	uartrx<=1;
+	#20ns
+	//uartrx<=0;
 
-        #1020ns
+        #102000ns
 
         $display ("T=%0t End of simulation", $realtime);
         $finish;
