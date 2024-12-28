@@ -12,15 +12,10 @@ module top (
   output wire testwire
 );
 
-  wire        int_osc            ;
-  reg  [27:0] frequency_counter_i;
+  reg  [27:0] frequency_counter_i = 0;
 
   assign testwire = frequency_counter_i[5];
  
-  always @(posedge int_osc) begin
-    frequency_counter_i <= frequency_counter_i + 1'b1;
-  end
-
 //----------------------------------------------------------------------------
 //                                                                          --
 //                       Instantiate RGB primitive                          --
