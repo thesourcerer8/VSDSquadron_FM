@@ -26,7 +26,7 @@ endmodule
 
 
 
-`include "rgb_blink.v"
+`include "top.v"
 
 module testbench ();
 reg clk;
@@ -40,7 +40,7 @@ begin
         #1.25ns;
 end
 
-rgb_blink myrgb(.hw_clk(clk),.uartrx(uartrx));
+top mytop(.hw_clk(clk),.uartrx(uartrx));
 
 initial
 begin
