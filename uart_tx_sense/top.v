@@ -5,7 +5,7 @@
 //                         Module Declaration                               --
 //                                                                          --
 //----------------------------------------------------------------------------
-module rgb_blink (
+module top (
   // outputs
   output wire led_red  , // Red
   output wire led_blue , // Blue
