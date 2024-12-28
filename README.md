@@ -41,4 +41,16 @@ make clean
 
 ---
 
+# List of Example-projects:
+
+1. **[Project Blink LED](blink_led/)**  
+    It blinks the led in different colours.
+
+2. **[uart_tx](uart_tx/)**   
+   It sends the 'D' characters repeatedly from the FPGA through USB to the computer. 
+   
+4. **[led_white](led_white/)**  
+    Constanlty lisghts up the RGB led with white light.
+
 Happy hacking! 🚀
+
