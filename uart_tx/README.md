@@ -1,10 +1,10 @@
-# For running uart_tx
-When I flash the code for uart_tx on the FPGA, I am basically running the top.v file along with uart_trx.v file.
-The uart_tx I have used works in one direction only, ie. it sends data without having a provison to receive the data back from the receiver. 
-For UART to work, the Baud rate shoud be the same on both the transmitting anf receiving side. Here the Baud rate is 9600 Hz. 
-Its sending out D all the time. To check it, one should install PuTTY, it is used as a terminal emulator. It's a completely free, open source sofware.
+## What does it do?
+This example shows how to communicate from the FPGA chip to your computer using a USB-C cable with the [UART protocol](https://en.wikipedia.org/wiki/Universal_asynchronous_receiver-transmitter)
+Its sending out the character 'D' repeatedly all the time. If you press any keys on the keyboard, the output won't change because its just used to transmit, not receive any data.
 
 ## Testing on Windows 
+To check it, one should install PuTTY, it is used as a terminal emulator.
+It's a completely free, open source sofware.
 You can download PuTTY from the URL- https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html
 To download it from the given URL, just install the Package files from MSI(Windows Installer), depending on the computer you have. 
 When you open PuTTY app after it's installed on your machine, just select the connection type as Serial, then you should check which 
@@ -20,5 +20,7 @@ Install picocom in the Linux terminal by running command ```apt install picocom`
 Then use the command ```make terminal``` to run the picocom. It will start displaying the output 'D' in the terminal. 
 To exit and stop, use ```Ctrl A+X```
 
-
-
+## How does it work?
+The UART protocol is implemented im the module uart_trx.v file.
+It works in one direction only, ie. it sends data without having a provison to receive the data back from the receiver. 
+For UART to work, the Baud rate shoud be the same on both the transmitting anf receiving side. Here the Baud rate is 9600 Hz.
