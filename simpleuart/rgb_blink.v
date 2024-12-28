@@ -67,6 +67,7 @@ module rgb_blink (
 	      //reg_dat_di <= reg_dat_di+1;
 
   end
+  reg [31:0] wedelay = 0;
 
 //----------------------------------------------------------------------------
 //                                                                          --
@@ -75,8 +76,12 @@ module rgb_blink (
 //----------------------------------------------------------------------------
   always @(posedge hw_clk) begin
 
-    //reg_dat_we <= 0;
-
+    if(wedelay) begin
+      wedelay <= wedelay-1;
+      if(!wedelay) begin
+	reg_dat_we <= 0;
+      end
+    end	    
     case(mystate)
       0: begin
         reg_dat_we <=0;
@@ -93,7 +98,7 @@ module rgb_blink (
         mystate<=2;
         end
       2: begin
-         if(reg_dat_do!=-1 && prevbit==-1) begin // We received a Byte
+         //if(reg_dat_do!=-1 && prevbit==-1) begin // We received a Byte
           case (reg_dat_do)
             -1: begin
 		end
@@ -139,10 +144,11 @@ module rgb_blink (
               //reg_dat_re <= 0; // We stop reading
               reg_dat_di <= reg_dat_do+1; // We choose what character we want to write
               reg_dat_we <= 1; // We start writing
+	      wedelay <= 1000;
 	      //mystate<= 3;
 	    end
           endcase
-         end
+         //end
          prevbit <= reg_dat_do;
 	end
    	3: begin
