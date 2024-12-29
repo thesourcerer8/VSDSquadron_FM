@@ -62,7 +62,7 @@ module top (
   assign io5 =nand_data[5];
   assign io6 =nand_data[6];
   assign io7 =nand_data[7];
-  reg [7:0] cmd_in;
+  reg [5:0] cmd_in;
   reg [7:0] nand_data_out;
   reg [7:0] nand_data_in;
   reg nand_busy;
