@@ -22,5 +22,22 @@ set_io io4 45 #5b
 set_io io5 46 #0a
 set_io io6 47 #2a
 set_io io7 48 #4a
-
+# bottom edge:
+set_io io8 2  #6a
+set_io io9 3  #9b
+set_io io10 4  #8a
+set_io io11 6  #13b
+set_io io12 9  #16a
+set_io io13 10 #18a
+set_io io14 11 #20a
+set_io io15 12 #22a
+# top edge:
+set_io nand_nce1 37 #45a
+set_io nand_rnb1 36 #48b
+set_io nand_nce2 35 #46b
+set_io nand_rnb2 34 #44b
+set_io nand_nce3 32 #43a
+set_io nand_rnb3 31 #42b
+set_io vsp 28 #41a
+set_io uart 27 #38b
 
