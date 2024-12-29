@@ -21,6 +21,8 @@
 //`include "timescale.sv"
 `timescale 1 ns/10 ps  // time-unit = 1 ns, precision = 10 ps
 
+//`define ENABLE_WRITE_ERASE_SUPPORT 1
+//`define ENABLE_PARAM_PAGE_SUPPORT 1
 
 module nand_master(clk,enable,nand_cle,nand_ale,nand_nwe,nand_nwp,nand_nce,nand_nre,nand_rnb,nand_data,nreset,data_out,data_in,busy,activate,cmd_in);
 
@@ -40,7 +42,7 @@ module nand_master(clk,enable,nand_cle,nand_ale,nand_nwe,nand_nwp,nand_nce,nand_
 	reg [15:0] nand_data_reg;
 	wire [15:0] nand_data_recv;
 	assign nand_data = nand_data_reg;
-		
+
 	// Component interface
 	input nreset;
 	output reg [7:0] data_out;
@@ -57,7 +59,7 @@ module nand_master(clk,enable,nand_cle,nand_ale,nand_nwe,nand_nwp,nand_nce,nand_
 	wire cle_busy;
 	reg [15:0] cle_data_in;
 	wire [15:0] cle_data_out;
-	
+
 	reg ale_activate;
 	wire ale_latch_ctrl;
 	wire ale_write_enable;
@@ -67,39 +69,43 @@ module nand_master(clk,enable,nand_cle,nand_ale,nand_nwe,nand_nwp,nand_nce,nand_
 
 	// IO Unit.
 	// This component implements NAND's read/write interfaces.
-	
+
 	// IO Unit related signals
 	reg io_rd_activate	;
 	wire io_rd_io_ctrl	;
 	wire io_rd_busy		;
 	reg [15:0] io_rd_data_in;
 	wire [15:0] io_rd_data_out;
-	
+
 	reg io_wr_activate	;
 	wire io_wr_io_ctrl	;
 	wire io_wr_busy		;
 	reg [15:0] io_wr_data_in;
 	wire [15:0] io_wr_data_out;
-	
+
 	// FSM
 	reg [5:0] state = `M_RESET;
 	reg [5:0] n_state = `M_RESET;
 	reg [4:0] substate = `MS_BEGIN;
 	reg [4:0] n_substate = `MS_BEGIN;
-	
+
 	reg [31:0] delay=0;
-	
+
 	reg [31:0] byte_count=0;
 	reg [31:0] page_idx=0;
 	reg [7:0] page_data [`max_page_idx:0];
-	reg [7:0] page_param [255:0];
+`ifdef ENABLE_PARAM_PAGE_SUPPORT
+	reg [7:0] page_param [255:0] /* synthesis syn_ramstyle = "no_rw_check" */;
+`endif
+	reg is_onfi_compliant;
+	reg is_normal_flash;
 	reg [7:0] chip_id [4:0];
 	reg [7:0] current_address [4:0];
 	reg [31:0] data_bytes_per_page;
 	reg [31:0] oob_bytes_per_page;
 	reg [10:0] addr_cycles;
 
-	
+
 //	The following is a sort of a status register. Bit set to 1 means TRUE, bit set to 0 means FALSE:
 //	0 - is ONFI compliant
 //	1 - bus width (0 - x8 / 1 - x16)
@@ -115,7 +121,7 @@ module nand_master(clk,enable,nand_cle,nand_ale,nand_nwe,nand_nwp,nand_nce,nand_
 
 	
 	// Asynchronous command latch interface.
-	latch_unit ACL 
+	latch_unit ACL
 	(
 		.latch_type (`LATCH_CMD),
 		.activate (cle_activate),
@@ -213,7 +219,7 @@ always @(posedge clk) begin
 	end else begin
 		cle_activate = 1'b0;
 	end
-							
+
 	// Activation of address latch unit
 	if ( (state == `M_NAND_READ_PARAM_PAGE  &  substate == `MS_SUBMIT_COMMAND) |		// initiate address submission for READ PARAMETER PAGE command
 			(state == `M_NAND_BLOCK_ERASE  &  substate == `MS_SUBMIT_COMMAND) |	// initiate address submission for BLOCK ERASE command
@@ -227,7 +233,7 @@ always @(posedge clk) begin
 	end else begin
 		ale_activate = 1'b0;
 	end
-							
+
 	// Activation of read byte mechanism
 	if ( (state == `M_NAND_READ_PARAM_PAGE & substate == `MS_READ_DATA0) |			// initiate byte read for READ PARAMETER PAGE command
 			(state == `M_NAND_READ_STATUS & substate == `MS_READ_DATA0) |		// initiate byte read for READ STATUS command
@@ -238,7 +244,7 @@ always @(posedge clk) begin
 	end else begin
 		io_rd_activate = 1'b0;
 	end
-							
+
 	// Activation of write byte mechanism
 	if ( (state == `M_NAND_PAGE_PROGRAM & substate == `MS_WRITE_DATA3) | 			// initiate byte write for PAGE_PROGRAM command
 		(state == `MI_BYPASS_DATA_WR & substate == `MS_WRITE_DATA0) ) begin 		// writing byte directly to the chip
@@ -280,13 +286,13 @@ always @(posedge clk) begin
 					nand_nce = 1'b1;
 					nand_nwp = 1'b0;
 					nand_nre = 1'b1;
-				end	
+				end
 				// This is in fact a command interpreter
 				`M_IDLE: begin
 					if(activate == 1'b1) begin
 						state= cmd_in[5:0];
 					end
-				end	
+				end
 				// Reset the NAND chip
 				`M_NAND_RESET: begin
 					//$display("NM: M_NAND_RESET received");
@@ -294,13 +300,13 @@ always @(posedge clk) begin
 					state = `M_WAIT;
 					n_state	= `M_IDLE;
 					delay = `t_wb + 8;
-				end	
+				end
 				// Read the status register of the controller
 				`MI_GET_STATUS: begin
 					//$display("NM: MI_GET_STATUS received");
 					data_out = status;
 					state    = `M_IDLE;
-				end	
+				end
 				// Set CE# to '0' (enable NAND chip)
 				`MI_CHIP_ENABLE: begin
 					//$display("NM: MI_CHIP_ENABLE");
@@ -315,6 +321,7 @@ always @(posedge clk) begin
 					state	 = `M_IDLE;
 					status[2]= 1'b0;
 				end
+`ifdef ENABLE_WRITE_ERASE_SUPPORT
 				// Set WP# to 1'b0 (enable write protection)
 				`MI_WRITE_PROTECT: begin
 					//$display("NM: MI_WRITE_PROTECT received");
@@ -330,6 +337,7 @@ always @(posedge clk) begin
 					status[3]= 1'b0;
 					state	 = `M_IDLE;
 				end
+`endif
 				// Reset the index register.
 				// Index register holds offsets into JEDEC ID, Parameter Page buffer or Data Page buffer depending on
 				// the operation being performed
@@ -337,7 +345,7 @@ always @(posedge clk) begin
 					//$display("NM: MI_RESET_INDEX received");
 					page_idx = 0;
 					state	 = `M_IDLE;
-				end	
+				end
 				// Read 1 byte from JEDEC ID and increment the index register.
 				// If the value points outside the 5 byte JEDEC ID array, 
 				// the register is reset to 0 and bit 4 of the status register
@@ -355,6 +363,7 @@ always @(posedge clk) begin
 					end
 					state = `M_IDLE;
 				end	
+`ifdef ENABLE_PARAM_PAGE_SUPPORT
 				// Read 1 byte from 256 bytes buffer that holds the Parameter Page.
 				// If the value goes beyond 255, then the register is reset and 
 				// bit 4 of the status register is set to 1'b1
@@ -371,6 +380,7 @@ always @(posedge clk) begin
 					end
 					state = `M_IDLE;
 				end	
+`endif
 				// Read 1 byte from the buffer that holds the content of last read 
 				// page. The limit is variable and depends on the values in 
 				// the Parameter Page. In case the index register points beyond 
@@ -437,6 +447,7 @@ always @(posedge clk) begin
 					end 
 					state= `M_IDLE;
 				end
+`ifdef ENABLE_WRITE_ERASE_SUPPORT
 				// Program one page.
 				`M_NAND_PAGE_PROGRAM: begin
 					//$display("NM: M_NAND_PAGE_PROGRAM received");
@@ -504,6 +515,7 @@ always @(posedge clk) begin
 						substate= `MS_BEGIN;
 					end
 				end	
+`endif
 				// Reads single page into the buffer.
 				`M_NAND_READ: begin
 					//$display("NM: M_NAND_READ received");
@@ -597,6 +609,7 @@ always @(posedge clk) begin
 						state			= `M_IDLE;
 					end
 				end	
+`ifdef ENABLE_WRITE_ERASE_SUPPORT
 				// Erase block specified by current_address
 				`M_NAND_BLOCK_ERASE: begin
 					//$display("NM: M_NAND_BLOCK_ERASE received");
@@ -636,6 +649,7 @@ always @(posedge clk) begin
 						byte_count		= 0;
 					end
 				end	
+`endif
 				// Read NAND chip JEDEC ID
 				`M_NAND_READ_ID: begin
 					$display("NM: M_NAND_READ_ID received");
@@ -691,6 +705,7 @@ always @(posedge clk) begin
 						substate		= `MS_SUBMIT_COMMAND;
 						state			= `M_WAIT;
 						n_state 		= `M_NAND_READ_PARAM_PAGE;
+						is_onfi_compliant       = 1;
 					end else if(substate == `MS_SUBMIT_COMMAND) begin
 						ale_data_in		= 16'h0000;
 						substate		= `MS_SUBMIT_ADDRESS;
@@ -709,7 +724,35 @@ always @(posedge clk) begin
 						n_state			= `M_NAND_READ_PARAM_PAGE;
 						substate		= `MS_READ_DATA1;
 					end else if(substate == `MS_READ_DATA1) begin
+`ifdef ENABLE_PARAM_PAGE_SUPPORT
 						page_param[page_idx]	= io_rd_data_out[7:0];
+`endif
+						if(page_idx==0 && io_rd_data_out[7:0] != 8'h4f) is_onfi_compliant = 0;
+						if(page_idx==1 && io_rd_data_out[7:0] != 8'h4e) is_onfi_compliant = 0;
+						if(page_idx==2 && io_rd_data_out[7:0] != 8'h46) is_onfi_compliant = 0;
+						if(page_idx==3 && io_rd_data_out[7:0] != 8'h49) is_onfi_compliant = 0;
+						if(page_idx==6 && is_onfi_compliant) status[1]	= io_rd_data_out[0];
+                                                if(page_idx==63 && is_onfi_compliant) is_normal_flash = (io_rd_data_out==8'h20);
+						// Number of bytes per page
+						if(page_idx==80 && is_onfi_compliant && is_normal_flash) data_bytes_per_page[7:0]=io_rd_data_out;
+						if(page_idx==81 && is_onfi_compliant && is_normal_flash) data_bytes_per_page[15:8]=io_rd_data_out;
+						if(page_idx==82 && is_onfi_compliant && is_normal_flash) data_bytes_per_page[23:16]=io_rd_data_out;
+						if(page_idx==83 && is_onfi_compliant && is_normal_flash) data_bytes_per_page[31:24]=io_rd_data_out;
+						if(page_idx==79 && is_onfi_compliant && !is_normal_flash) data_bytes_per_page[7:0]=io_rd_data_out;
+						if(page_idx==80 && is_onfi_compliant && !is_normal_flash) data_bytes_per_page[15:8]=io_rd_data_out;
+						if(page_idx==81 && is_onfi_compliant && !is_normal_flash) data_bytes_per_page[23:16]=io_rd_data_out;
+						if(page_idx==82 && is_onfi_compliant && !is_normal_flash) data_bytes_per_page[31:24]=io_rd_data_out;
+
+						// Number of spare bytes per page (OOB)
+						if(page_idx==84 && is_onfi_compliant && is_normal_flash) oob_bytes_per_page[7:0]=io_rd_data_out;
+						if(page_idx==85 && is_onfi_compliant && is_normal_flash) oob_bytes_per_page[31:8]={16'b0,io_rd_data_out};
+						if(page_idx==83 && is_onfi_compliant && !is_normal_flash) oob_bytes_per_page[7:0]=io_rd_data_out;
+						if(page_idx==84 && is_onfi_compliant && !is_normal_flash) oob_bytes_per_page[31:8]={16'b0,io_rd_data_out};
+
+                                                // Number of address cycles
+						if(page_idx==101 && is_onfi_compliant && is_normal_flash) addr_cycles= 11'(io_rd_data_out[3:0])+11'(io_rd_data_out[7:4]);
+						if(page_idx==100 && is_onfi_compliant && !is_normal_flash) addr_cycles= 11'(io_rd_data_out[3:0])+11'(io_rd_data_out[7:4]);
+
 						if(0 < byte_count) begin
 							page_idx	= page_idx + 1;
 							substate	= `MS_READ_DATA0;
@@ -723,37 +766,39 @@ always @(posedge clk) begin
 						state			= `M_IDLE;
 						
 						// Check the chip for being ONFI compliant
-						if(page_param[0] == 8'h4f & page_param[1] == 8'h4e & page_param[2] == 8'h46 & page_param[3] == 8'h49) begin
+						//if(page_param[0] == 8'h4f & page_param[1] == 8'h4e & page_param[2] == 8'h46 & page_param[3] == 8'h49) begin
+						if(is_onfi_compliant) begin
 							// Set status bit 0
 							status[0]	= 1'b1;
 							
 							// Bus width
-							status[1]	= page_param[6][0];
+							//status[1]	= page_param[6][0];
 						 
 							// Setup counters:
 							// Normal FLAsh
-							if(page_param[63] == 8'h20) begin
+							// if(page_param[63] == 8'h20) begin
+							if(is_normal_flash) begin
 								// Number of bytes per page
-								tmp_int			= {page_param[83],page_param[82],page_param[81],page_param[80]};
-								data_bytes_per_page 	= tmp_int;
+								//tmp_int			= {page_param[83],page_param[82],page_param[81],page_param[80]};
+								//data_bytes_per_page 	= tmp_int;
 								
 								// Number of spare bytes per page (OOB)
-								tmp_int			= {16'b0,page_param[85],page_param[84]};
-								oob_bytes_per_page	= tmp_int;
+								//tmp_int			= {16'b0,page_param[85],page_param[84]};
+								//oob_bytes_per_page	= tmp_int;
 								
 								// Number of address cycles
-								addr_cycles		= 11'(page_param[101][3:0]) + 11'(page_param[101][7:4]);
+								//addr_cycles		= 11'(page_param[101][3:0]) + 11'(page_param[101][7:4]);
 							end else begin
 								// Number of bytes per page
-								tmp_int			= {page_param[82],page_param[81],page_param[80],page_param[79]};
-								data_bytes_per_page 	= tmp_int;
+								//tmp_int			= {page_param[82],page_param[81],page_param[80],page_param[79]};
+								//data_bytes_per_page 	= tmp_int;
 								
 								// Number of spare bytes per page (OOB)
-								tmp_int			= {16'b0,page_param[84],page_param[83]};
-								oob_bytes_per_page	= tmp_int;
+								//tmp_int			= {16'b0,page_param[84],page_param[83]};
+								//oob_bytes_per_page	= tmp_int;
 								
 								// Number of address cycles
-								addr_cycles		= 11'(page_param[100][3:0]) + 11'(page_param[100][7:4]);
+								//addr_cycles		= 11'(page_param[100][3:0]) + 11'(page_param[100][7:4]);
 							end
 						end
 					end
