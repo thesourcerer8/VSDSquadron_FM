@@ -107,7 +107,7 @@
 `define MS_END 13
 //	} master_substate_t;
 
-`define max_page_idx 10000
+`define max_page_idx 100 // TODO: THIS IS TOO SMALL FOR A REAL NAND FLASH, UP TO 20000 WILL BE NEEDED, SO WE HAVE TO CHANGE THE ARCHITECTURE TO SUPPORT MORE
 	//typedef logic [7:0] page_t [max_page_idx];
 	//typedef logic [7:0] param_page_t [256];
 	//typedef logic [7:0] nand_id_t [5];
