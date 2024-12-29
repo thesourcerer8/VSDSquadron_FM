@@ -34,24 +34,18 @@ module top (
 );
 
 
-    SB_IO_OD #(             // open drain IP instance
-    .PIN_TYPE(6'b011001)  // configure as output
-    ) pin_out_driver (
-    .PACKAGEPIN(LED_B), // connect to this pin
-    .DOUT0(ledb)           // output the state of "led"
-    );
 
     SB_IO_OD #(
 		.PIN_TYPE(6'b010001),
 		.NEG_TRIGGER(1'b0)
 	) IO_PIN_I (
-		.PACKAGEPIN(o1),
+		.PACKAGEPIN(38),
 		.LATCHINPUTVALUE(),
 		.CLOCKENABLE(),
 		.INPUTCLK(),
 		.OUTPUTCLK(),
 		.OUTPUTENABLE(),
-		.DOUT0(o1i),
+		.DOUT0(io0),
 		.DOUT1(),
 		.DIN0(),
 		.DIN1()
@@ -167,7 +161,7 @@ module top (
     if(actdelay) begin
       actdelay <= actdelay-1;
       if(!actdelay) begin
-	activate <= 0;
+	nand_activate <= 0;
       end
     end	    
 
@@ -233,9 +227,17 @@ module top (
               rgb_blue <= 1;
               rgb_green <= 0;
               end
+            "R": begin // This reads a resulting nand data and sends one byte
+              reg_dat_di <= nand_data_out;
+	      reg_dat_we <= 1;
+	      wedelay <= 1000;
+              end
+	    "S": begin // This reads a byte from UART and sends it to the NAND controller
+	      mystate<=4;
+	      end
             default: begin
               cmd_in <= reg_dat_do; // DO a NAND command
-              activate <= 1; 
+              nand_activate <= 1; 
 	      actdelay <= 2;
               reg_dat_di <= reg_dat_do+1; // We choose what character we want to write
               reg_dat_we <= 1; // We start writing
@@ -249,6 +251,12 @@ module top (
    	3: begin
   	  reg_dat_we <= 0; // In the next state we switch the writing off again and start reading again
 	  mystate<=1;
+	end
+	4: begin
+          if (reg_dat_do!=-1) begin
+	    nand_data_in <= reg_dat_do[7:0];
+	    mystate<=2;
+	  end
 	end
       default: mystate<=0;
     endcase
