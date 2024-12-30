@@ -44,10 +44,10 @@ make clean
 # List of Example-projects:
 
 1. **[Project Blink LED](blink_led/)**  
-    It blinks the led in different colours.
+    It blinks the led in different colours. It is using an internal oscillator as a time source for blinking.
 
-2. **[led_white](led_white/)**  
-    Constantly lights up the RGB led with white light.
+2. **[blink_hw](blink_hw/)**   
+   It blinks the led in different colours by using the crystal hardware osscilator on the board. 
 
 3. **[led_red](led_red/)**  
     Constantly lights up the RGB led with red light.
@@ -58,11 +58,27 @@ make clean
 5. **[led_green](led_green/)**  
     Constantly lights up the RGB led with green light.
 
-6. **[uart_tx](uart_tx/)**   
-   It sends the 'D' characters repeatedly from the FPGA through USB to the computer. 
+6. **[led_white](led_white/)**  
+    Constantly lights up the RGB led with white light.
 
-7. **[uart_tx_sense](uart_tx_sense/)**   
-   It sends the 'D' characters repeatedly from the FPGA through USB to the computer, and lights up the LED whenever a character is received from the PC 
+7. **[uart_tx](uart_tx/)**   
+    It sends the 'D' characters repeatedly from the FPGA through USB to the computer. 
 
+8. **[uart_tx_sense](uart_tx_sense/)**  
+    It sends the 'D' characters repeatedly from the FPGA through USB to the computer, and lights up the LED whenever a character is received from the PC
+
+9. **[uart_loopback](uart_loopback/)**  
+   It just receives the signal directly from the PC to the FPGA. So whatever character we type on the keyboard appears as the output.
+
+10. **[simpleuart](simpleuart/)**   
+    Its a controller that accepts commands from the PC keyboard. It parses the input and plays with the output.
+
+11. **[nandcontroller](nandcontroller/)**
+    Its a controller to interface with NAND Flash memory, for USB pen drives.
+    
+12. **[RISCV](RISCV/)**   
+     Its a CPU based on RISC-V instruction set architecture.
+
+    
 Happy hacking! 🚀
 
