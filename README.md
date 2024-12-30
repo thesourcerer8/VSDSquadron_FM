@@ -73,7 +73,7 @@ make clean
 10. **[simpleuart](simpleuart/)**   
     Its a controller that accepts commands from the PC keyboard. It parses the input and plays with the output.
 
-11. **[nandcontroller](nandcontroller/)**
+11. **[nandcontroller](nandcontroller/)**   
     Its a controller to interface with NAND Flash memory, for USB pen drives.
     
 12. **[RISCV](RISCV/)**   
