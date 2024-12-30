@@ -21,7 +21,7 @@ flash:
 	iceprog $(TOP).bin
 
 clean:
-	rm -rf $(TOP).blif $(TOP).asc $(TOP).bin $(TOP).json $(TOP).timings
+	rm -rf $(TOP).blif $(TOP).asc $(TOP).bin $(TOP).json $(TOP).timings a.out testbench testbench.vcd
 
 terminal:
 	sudo picocom -b $(BAUDS) $(PICO_DEVICE) --imap lfcrlf,crcrlf --omap delbs,crlf --send-cmd "ascii-xfr -s -l 30 -n"
@@ -30,3 +30,8 @@ cycle:
 	git pull
 	make
 	sudo make flash
+
+test:
+	iverilog -o testbench testbench.sv -Wall -g2005-sv
+	vvp testbench
+	gtkwave testbench.gtkw

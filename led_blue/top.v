@@ -1,28 +1,33 @@
-`include "uart_trx.v"
-
 //----------------------------------------------------------------------------
 //                                                                          --
 //                         Module Declaration                               --
 //                                                                          --
 //----------------------------------------------------------------------------
-module rgb_blink (
+module top (
   // outputs
   output wire led_red  , // Red
   output wire led_blue , // Blue
   output wire led_green , // Green
-  output wire uarttx , // UART Transmission pin
-  input wire  hw_clk
+  input wire hw_clk,  // Hardware Oscillator, not the internal oscillator
+  output wire testwire
 );
 
   wire        int_osc            ;
   reg  [27:0] frequency_counter_i;
-  
-/* 9600 Hz clock generation (from 12 MHz) */
-    reg clk_9600 = 0;
-    reg [31:0] cntr_9600 = 32'b0;
-    parameter period_9600 = 625;
-    
-uart_tx_8n1 DanUART (.clk (clk_9600), .txbyte("D"), .senddata(frequency_counter_i[24]), .tx(uarttx));
+
+  assign testwire = frequency_counter_i[5];
+ 
+  always @(posedge int_osc) begin
+    frequency_counter_i <= frequency_counter_i + 1'b1;
+  end
+
+
+//----------------------------------------------------------------------------
+//                                                                          --
+//                       Counter                                            --
+//                                                                          --
+//----------------------------------------------------------------------------
+
 //----------------------------------------------------------------------------
 //                                                                          --
 //                       Internal Oscillator                                --
@@ -33,33 +38,18 @@ uart_tx_8n1 DanUART (.clk (clk_9600), .txbyte("D"), .senddata(frequency_counter_
 
 //----------------------------------------------------------------------------
 //                                                                          --
-//                       Counter                                            --
-//                                                                          --
-//----------------------------------------------------------------------------
-  always @(posedge int_osc) begin
-    frequency_counter_i <= frequency_counter_i + 1'b1;
-        /* generate 9600 Hz clock */
-        cntr_9600 <= cntr_9600 + 1;
-        if (cntr_9600 == period_9600) begin
-            clk_9600 <= ~clk_9600;
-            cntr_9600 <= 32'b0;
-        end
-  end
-
-//----------------------------------------------------------------------------
-//                                                                          --
 //                       Instantiate RGB primitive                          --
 //                                                                          --
 //----------------------------------------------------------------------------
   SB_RGBA_DRV RGB_DRIVER (
     .RGBLEDEN(1'b1                                            ),
-    .RGB0PWM (frequency_counter_i[24]&frequency_counter_i[23] ),
-    .RGB1PWM (frequency_counter_i[24]&~frequency_counter_i[23]),
-    .RGB2PWM (~frequency_counter_i[24]&frequency_counter_i[23]),
+    .RGB0PWM (1'b0), // red
+    .RGB1PWM (1'b0), // green
+    .RGB2PWM (1'b1), // blue
     .CURREN  (1'b1                                            ),
-    .RGB0    (led_green                                       ), //Actual Hardware connection
-    .RGB1    (led_blue                                        ),
-    .RGB2    (led_red                                         )
+    .RGB0    (led_red                                       ), //Actual Hardware connection
+    .RGB1    (led_green                                       ),
+    .RGB2    (led_blue                                        )
   );
   defparam RGB_DRIVER.RGB0_CURRENT = "0b000001";
   defparam RGB_DRIVER.RGB1_CURRENT = "0b000001";

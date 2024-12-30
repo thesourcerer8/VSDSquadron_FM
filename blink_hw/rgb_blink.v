@@ -7,7 +7,8 @@ module rgb_blink (
   // outputs
   output wire led_red  , // Red
   output wire led_blue , // Blue
-  output wire led_green  // Green
+  output wire led_green, // Green
+  input wire hw_clk
 );
 
   wire        int_osc            ;
@@ -26,7 +27,7 @@ module rgb_blink (
 //                       Counter                                            --
 //                                                                          --
 //----------------------------------------------------------------------------
-  always @(posedge int_osc) begin
+  always @(posedge hw_clk) begin
     frequency_counter_i <= frequency_counter_i + 1'b1;
   end
 

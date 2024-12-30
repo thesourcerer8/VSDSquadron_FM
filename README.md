@@ -46,11 +46,23 @@ make clean
 1. **[Project Blink LED](blink_led/)**  
     It blinks the led in different colours.
 
-2. **[uart_tx](uart_tx/)**   
+2. **[led_white](led_white/)**  
+    Constantly lights up the RGB led with white light.
+
+3. **[led_red](led_red/)**  
+    Constantly lights up the RGB led with red light.
+
+4. **[led_blue](led_blue/)**  
+    Constantly lights up the RGB led with blue light.
+
+5. **[led_green](led_green/)**  
+    Constantly lights up the RGB led with green light.
+
+6. **[uart_tx](uart_tx/)**   
    It sends the 'D' characters repeatedly from the FPGA through USB to the computer. 
-   
-4. **[led_white](led_white/)**  
-    Constanlty lisghts up the RGB led with white light.
+
+7. **[uart_tx_sense](uart_tx_sense/)**   
+   It sends the 'D' characters repeatedly from the FPGA through USB to the computer, and lights up the LED whenever a character is received from the PC 
 
 Happy hacking! 🚀
 
