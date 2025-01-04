@@ -12,7 +12,7 @@ PICO_DEVICE=/dev/ttyUSB0   # replace by the terminal used by your device
 BAUDS=115200
 
 build:
-	yosys -DCPU_FREQ=$(CPU_FREQ) -p "synth_ice40 -abc9 -device u -dsp -top $(TOP) -json $(TOP).json" $(VERILOG_FILE)
+	yosys -DCPU_FREQ=$(CPU_FREQ) -p "synth_ice40 -abc9 -spram -device u -dsp -top $(TOP) -json $(TOP).json" $(VERILOG_FILE)
 	nextpnr-ice40 --force --json $(TOP).json --pcf $(PCF_FILE).pcf --asc $(TOP).asc --freq $(BOARD_FREQ) --$(FPGA_VARIANT) --package $(FPGA_PACKAGE) --opt-timing
 	icetime -p $(PCF_FILE).pcf -P $(FPGA_PACKAGE) -r $(TOP).timings -d $(FPGA_VARIANT) -t $(TOP).asc
 	icepack -s $(TOP).asc $(TOP).bin
