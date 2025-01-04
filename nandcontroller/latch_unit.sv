@@ -45,71 +45,71 @@ module latch_unit (clk,activate,data_in,latch_ctrl,write_enable,busy,data_out,la
 always @(posedge clk) begin
 
 	if (state != `LATCH_IDLE) begin
-		busy = 1;
+		busy <= 1;
 	end else begin
-		busy = 0;
+		busy <= 0;
 	end
 
 	if (state == `LATCH_HOLD | (state == `LATCH_DELAY & (n_state == `LATCH_HOLD | n_state == `LATCH_WAIT))) begin
-		latch_ctrl = 1;
+		latch_ctrl <= 1;
 	end else begin
-		latch_ctrl = 0;
+		latch_ctrl <= 0;
 	end
 
 	if (state == `LATCH_DELAY & n_state == `LATCH_HOLD) begin
-		write_enable = 1'b0;
+		write_enable <= 1'b0;
 	end else if (state != `LATCH_IDLE) begin
-		write_enable = 1'b1;
+		write_enable <= 1'b1;
 	end else begin
-		write_enable = 1'b1; // 'H'; // ?!?!?! HIGH = 1 ?
+		write_enable <= 1'b1; // 'H'; // ?!?!?! HIGH = 1 ?
 	end
 									
 	if (state != `LATCH_IDLE & state != `LATCH_WAIT & n_state != `LATCH_IDLE) begin
-		data_out = data_in;
+		data_out <= data_in;
 	end else begin
-		data_out = 0; // "LLLLLLLLLLLLLLLLLL";
+		data_out <= 0; // "LLLLLLLLLLLLLLLLLL";
 	end
 
 		case(state)
 			`LATCH_IDLE:
 			begin
 				if(activate == 1'b1) begin
-					n_state	= `LATCH_HOLD;
-					state	= `LATCH_DELAY;
-					delay	= `t_wp;
+					n_state	<= `LATCH_HOLD;
+					state	<= `LATCH_DELAY;
+					delay	<= `t_wp;
 				end
 			end
 			`LATCH_HOLD:
 			begin
 				if(latch_type == `LATCH_CMD) begin
-					delay	= `t_clh;
+					delay	<= `t_clh;
 				end else begin
-					delay	= `t_wh;
+					delay	<= `t_wh;
 				end
-				n_state	= `LATCH_WAIT;
-				state	= `LATCH_DELAY;
+				n_state	<= `LATCH_WAIT;
+				state	<= `LATCH_DELAY;
 			end			
 			`LATCH_WAIT:
 			begin
 				if(latch_type == `LATCH_CMD) begin
-				//		-- Delay has been commented out. It is component's responsibility to 
-				//		--	execute proper delay on command submission.
-//--						state					= LATCH_DELAY;
+					//-- Delay has been commented out. It is component's responsibility to 
+					//-- execute proper delay on command submission.
+					//-- state	<= LATCH_DELAY;
 					state	= `LATCH_IDLE;
 					n_state	= `LATCH_IDLE;
-//--					delay	=	t_wb;						
+//--				delay	=	t_wb;						
 				end else begin
 					state	= `LATCH_IDLE;
 				end
 			end	
 			`LATCH_DELAY:
 				if(delay > 1) begin
-					delay 	= delay - 1;
+					delay 	<= delay - 1;
 				end else begin
-					state	= n_state;
+					state	<= n_state;
 				end
 			default:	
-				state	= `LATCH_IDLE;
+				state	<= `LATCH_IDLE;
 		endcase
 	end
 endmodule

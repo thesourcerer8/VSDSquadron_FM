@@ -44,21 +44,21 @@ module io_unit(clk,activate,data_in,io_ctrl,data_out,busy,io_type);
 always @(posedge clk) begin
 
 	if(state == `IO_IDLE) begin
-		busy = 1'b0;
+		busy <= 1'b0;
 	end else begin
-		busy = 1'b1;
+		busy <= 1'b1;
 	end
 
 	if ((io_type == `IO_WRITE & state != `IO_IDLE) | io_type == `IO_READ) begin
-		data_out = data_reg;
+		data_out <= data_reg;
 	end else begin
-		data_out = 0;
+		data_out <= 0;
 	end
 
 	if (state == `IO_DELAY & n_state == `IO_HOLD) begin
-		io_ctrl = 1'b0;
+		io_ctrl <= 1'b0;
 	end else begin
-		io_ctrl = 1'b1;
+		io_ctrl <= 1'b1;
 	end
 
 	// IO: process(clk, activate)
@@ -66,44 +66,44 @@ always @(posedge clk) begin
 		`IO_IDLE:
 		begin
 			if (io_type == `IO_WRITE) begin
-				data_reg = data_in;
+				data_reg <= data_in;
 			end
 			if (activate == 1'b1) begin
 				if (io_type == `IO_WRITE) begin
-					delay = `t_wp;
+					delay <= `t_wp;
 				end else begin
-					delay = `t_rea;
+					delay <= `t_rea;
 				end
-				n_state = `IO_HOLD;
-				state = `IO_DELAY;
+				n_state <= `IO_HOLD;
+				state <= `IO_DELAY;
 			end ;
 		end
 		`IO_HOLD:
 		begin
 			if (io_type == `IO_WRITE) begin
-				delay = `t_wh;
+				delay <= `t_wh;
 			end else begin
-				delay = `t_reh;
+				delay <= `t_reh;
 			end
-			n_state = `IO_IDLE;
-			state = `IO_IDLE;
+			n_state <= `IO_IDLE;
+			state <= `IO_IDLE;
 		end
 	 	`IO_DELAY:
 		begin
 			if (delay >1) begin	
-				delay = delay - 1 ;
+				delay <= delay - 1 ;
 				if (delay==2 & io_type == `IO_READ) begin
-					data_reg = data_in;
+					data_reg <= data_in;
 				end
 			end else begin
 				if (io_type == `IO_READ & n_state == `IO_IDLE) begin
-					data_reg = data_in; //This thing needs to be checked with real hardware. Assignment may be needed somewhat earlier.
+					data_reg <= data_in; //This thing needs to be checked with real hardware. Assignment may be needed somewhat earlier.
 				end
-				state = n_state;
+				state <= n_state;
 			end
 		end
 		default:
-			state = `IO_IDLE;
+			state <= `IO_IDLE;
 	endcase
 
 end

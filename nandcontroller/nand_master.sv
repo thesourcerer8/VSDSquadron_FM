@@ -21,7 +21,7 @@
 //`include "timescale.sv"
 `timescale 1 ns/10 ps  // time-unit = 1 ns, precision = 10 ps
 
-`define ENABLE_WRITE_ERASE_SUPPORT 1
+//`define ENABLE_WRITE_ERASE_SUPPORT 1
 `define ENABLE_PARAM_PAGE_SUPPORT 1
 `define ENABLE_PARAM_PAGE_STREAMING 1
 
@@ -47,7 +47,7 @@ module nand_master(clk,enable,nand_cle,nand_ale,nand_nwe,nand_nwp,nand_nce,nand_
 	// Component interface
 	input nreset;
 	output reg [7:0] data_out;
-	input [7:0] data_in;
+	input reg [7:0] data_in;
 	output reg busy; // := '0';
 	input activate;
 	input [5:0] cmd_in;
@@ -93,7 +93,7 @@ module nand_master(clk,enable,nand_cle,nand_ale,nand_nwe,nand_nwp,nand_nce,nand_
 	reg [31:0] delay=0;
 
 	reg [31:0] byte_count=0;
-	reg [23:0] page_idx;
+	reg [15:0] page_idx;
 	reg [7:0] page_data [`max_page_idx:0];
 `ifdef ENABLE_PARAM_PAGE_SUPPORT
 	reg [7:0] page_param [255:0] /* synthesis syn_ramstyle = "no_rw_check" */;
@@ -178,7 +178,7 @@ always @(posedge clk) begin
 	end
 
 	// Bidirection NAND data interface.
-	//nand_data	<=	(cle_data_out or ale_data_out or io_wr_data_out) when (cle_busy or ale_busy or io_wr_busy) = '1' else 16'hZZZZ;
+	//nand_data	<=	(cle_data_out or ale_data_out or io_wr_data_out) when (cle_busy or ale_busy or io_wr_busy) == '1' else 16'hZZZZ;
 	if (cle_busy == 1'b1) begin
 		nand_data_reg <= cle_data_out;
 	end else if (ale_busy == 1'b1) begin
@@ -262,7 +262,7 @@ always @(posedge clk) begin
 			//$display("NM: NRESET SIGNAL RECEIVED, INITIATING RESET");
 			state <= `M_RESET;
 		end
-//		end else if(activate = '1') begin
+//		end else if(activate == '1') begin
 //			state	<= state_switch(to_integer(unsigned(cmd_in)));
 		else if(enable == 1'b0) begin
 			//$display("NM: STATE MACHINE RUNNING");
@@ -362,7 +362,7 @@ always @(posedge clk) begin
 						page_idx <= 0;
 						status[4]<= 1'b1;
 					end
-					state = `M_IDLE;
+					state <= `M_IDLE;
 				end	
 `ifdef ENABLE_PARAM_PAGE_SUPPORT
 				// Read 1 byte from 256 bytes buffer that holds the Parameter Page.
@@ -487,7 +487,7 @@ always @(posedge clk) begin
 							substate <= `MS_WRITE_DATA2;
 						end
 					end else if(substate == `MS_WRITE_DATA2) begin
-						page_idx = page_idx + 1;
+						page_idx <= page_idx + 1;
 						io_wr_data_in[15:8] <= page_data[page_idx];
 						substate <= `MS_WRITE_DATA3;
 					end else if(substate == `MS_WRITE_DATA3) begin
@@ -540,7 +540,7 @@ always @(posedge clk) begin
 						n_state			<= `M_NAND_READ;
 					end else if(substate == `MS_SUBMIT_COMMAND1) begin
 						cle_data_in		<= 16'h0030;
-						//delay 			= `t_wb;
+						//delay 		<= `t_wb;
 						substate		<= `MS_DELAY;
 						state 			<= `M_WAIT;
 						n_state			<= `M_NAND_READ;
@@ -623,7 +623,7 @@ always @(posedge clk) begin
 						
 					end else if(substate == `MS_SUBMIT_COMMAND) begin
 						byte_count		<= byte_count - 1;
-						ale_data_in[15:8]= 8'h00;
+						ale_data_in[15:8]	<= 8'h00;
 						ale_data_in[7:0]	<= current_address[5 - byte_count];
 						substate		<= `MS_SUBMIT_ADDRESS;
 						state			<= `M_WAIT;
@@ -871,7 +871,7 @@ always @(posedge clk) begin
 				end	
 				`MI_BYPASS_DATA_WR: begin
 					if(substate == `MS_BEGIN) begin
-						io_wr_data_in[15:0] = {8'h00,data_in[7:0]}; //page_data(page_idx);
+						io_wr_data_in[15:0] <= {8'h00,data_in[7:0]}; //page_data(page_idx);
 						substate 	<= `MS_WRITE_DATA0;
 						state 		<= `M_WAIT;
 						n_state		<= `MI_BYPASS_DATA_WR;
@@ -887,8 +887,8 @@ always @(posedge clk) begin
 						substate	<= `MS_READ_DATA0;
 						
 					end else if(substate == `MS_READ_DATA0) begin
-						//page_data(page_idx) = io_rd_data_out[7:0];
-						data_out[7:0] = io_rd_data_out[7:0];
+						//page_data(page_idx) <= io_rd_data_out[7:0];
+						data_out[7:0]	<= io_rd_data_out[7:0];
 						substate	<= `MS_BEGIN;
 						state 		<= `M_IDLE;
 					end
