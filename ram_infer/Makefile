@@ -35,3 +35,7 @@ test:
 	iverilog -o testbench testbench.sv -Wall -g2005-sv
 	vvp testbench
 	gtkwave testbench.gtkw
+
+debug:
+	yosys -DCPU_FREQ=$(CPU_FREQ) -p "synth_ice40 -abc9 -device u -dsp -top $(TOP) -json $(TOP).json -run :map_ram ; show" $(VERILOG_FILE)
+
