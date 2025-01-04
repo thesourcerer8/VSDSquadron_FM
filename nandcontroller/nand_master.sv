@@ -21,7 +21,7 @@
 //`include "timescale.sv"
 `timescale 1 ns/10 ps  // time-unit = 1 ns, precision = 10 ps
 
-//`define ENABLE_WRITE_ERASE_SUPPORT 1
+`define ENABLE_WRITE_ERASE_SUPPORT 1
 `define ENABLE_PARAM_PAGE_SUPPORT 1
 `define ENABLE_PARAM_PAGE_STREAMING 1
 
