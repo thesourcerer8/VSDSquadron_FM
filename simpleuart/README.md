@@ -6,6 +6,14 @@ When you press any other character, the next character is printed, e.g. when you
 The engineering samples of the VSDSquadron had a too strong resistor in front of the LEDs, which had the effect that only one of the 3 LEDs (red, green or blue) could light up at a time, usually red had preference.
 It could be used to factory test the LEDs, whether they are working properly or not.
 
+# How it works
+
+This is a schematic view of the application:
+![image](https://github.com/user-attachments/assets/53fe5275-4f78-4a4f-b0c4-1c73844c3494)
+
+The USB connection from the PC is translated into the UART protocol by the FTDI FT232H chip. The UART connection has 2 connections for the bi-directional communication. On the ICE40 FPGA, the ![simpleuart](https://github.com/YosysHQ/picorv32/blob/main/picosoc/simpleuart.v) module (which was taken from the ![PicoSoC project](https://github.com/YosysHQ/picorv32/) ) handles the UART protocol, the controller is implemented in the ![top.v](top.v) Verilog file. The LEDs are controlled through 3 pins for red, green and blue, which are connected to the RGB LED on the VSD-Squadron board.
+
+
 # Simulation
 
 To run a simulation of the project you need to have iverilog and gtkwave installed, to install them you can use the following command:
