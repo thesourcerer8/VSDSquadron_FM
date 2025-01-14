@@ -30,3 +30,9 @@ cycle:
 	git pull
 	make
 	sudo make flash
+
+test:
+	iverilog -o testbench testbench.sv -Wall -g2005-sv
+	vvp testbench -fst
+	gtkwave testbench.gtkw
+

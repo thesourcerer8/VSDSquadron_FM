@@ -11,7 +11,7 @@ module rgb_blink (
 );
 
   wire        int_osc            ;
-  reg  [27:0] frequency_counter_i;
+  reg  [27:0] frequency_counter_i = 0;
 
 //----------------------------------------------------------------------------
 //                                                                          --

@@ -1,0 +1,59 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Tue Jan 14 18:52:40 2025
+[*]
+[dumpfile] "/home/philipp/Schreibtisch/Projekte/nand_controller/VSDSquadron_FM/blink_led/testbench.vcd"
+[dumpfile_mtime] "Tue Jan 14 18:51:37 2025"
+[dumpfile_size] 355216236
+[savefile] "/home/philipp/Schreibtisch/Projekte/nand_controller/VSDSquadron_FM/blink_led/testbench.gtkw"
+[timestart] 0
+[size] 1920 1033
+[pos] -1 -1
+*-32.522179 9860002000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] testbench.
+[treeopen] testbench.mytop.
+[sst_width] 278
+[signals_width] 305
+[sst_expanded] 1
+[sst_vpaned_height] 281
+@800022
+testbench.mytop.frequency_counter_i[27:0]
+@28
+(0)testbench.mytop.frequency_counter_i[27:0]
+(1)testbench.mytop.frequency_counter_i[27:0]
+(2)testbench.mytop.frequency_counter_i[27:0]
+(3)testbench.mytop.frequency_counter_i[27:0]
+(4)testbench.mytop.frequency_counter_i[27:0]
+(5)testbench.mytop.frequency_counter_i[27:0]
+(6)testbench.mytop.frequency_counter_i[27:0]
+(7)testbench.mytop.frequency_counter_i[27:0]
+(8)testbench.mytop.frequency_counter_i[27:0]
+(9)testbench.mytop.frequency_counter_i[27:0]
+(10)testbench.mytop.frequency_counter_i[27:0]
+(11)testbench.mytop.frequency_counter_i[27:0]
+(12)testbench.mytop.frequency_counter_i[27:0]
+(13)testbench.mytop.frequency_counter_i[27:0]
+(14)testbench.mytop.frequency_counter_i[27:0]
+(15)testbench.mytop.frequency_counter_i[27:0]
+(16)testbench.mytop.frequency_counter_i[27:0]
+(17)testbench.mytop.frequency_counter_i[27:0]
+(18)testbench.mytop.frequency_counter_i[27:0]
+(19)testbench.mytop.frequency_counter_i[27:0]
+(20)testbench.mytop.frequency_counter_i[27:0]
+(21)testbench.mytop.frequency_counter_i[27:0]
+(22)testbench.mytop.frequency_counter_i[27:0]
+(23)testbench.mytop.frequency_counter_i[27:0]
+(24)testbench.mytop.frequency_counter_i[27:0]
+(25)testbench.mytop.frequency_counter_i[27:0]
+(26)testbench.mytop.frequency_counter_i[27:0]
+(27)testbench.mytop.frequency_counter_i[27:0]
+@1001200
+-group_end
+@28
+testbench.mytop.int_osc
+testbench.mytop.led_blue
+testbench.mytop.led_green
+@29
+testbench.mytop.led_red
+[pattern_trace] 1
+[pattern_trace] 0
