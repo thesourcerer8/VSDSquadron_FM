@@ -43,7 +43,7 @@ make clean
 
 # List of Example-projects:
 
-1. **[Project Blink LED](blink_led/)**  
+1. **[blink_led](blink_led/)**  
     It blinks the led in different colours. It is using an internal oscillator as a time source for blinking.
 
 2. **[blink_hw](blink_hw/)**   
@@ -72,11 +72,14 @@ make clean
 
 10. **[simpleuart](simpleuart/)**   
     Its a controller that accepts commands from the PC keyboard. It parses the input and plays with the output.
+_
+11. **[ram_infer](ram_infer/)**   
+    It is testing the inferences of RAM blocks in the FPGA.
 
-11. **[nandcontroller](nandcontroller/)**   
+12. **[nandcontroller](nandcontroller/)**   
     Its a controller to interface with NAND Flash memory, for USB pen drives.
     
-12. **[RISCV](RISCV/)**   
+13. **[RISCV](RISCV/)**   
      Its a CPU based on RISC-V instruction set architecture.
 
     
